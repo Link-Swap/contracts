@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract LinkSwap is
+contract LinkSwapToken is
     ERC20,
     ERC20Burnable,
     AccessControl,

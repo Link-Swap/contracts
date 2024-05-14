@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./ILinkSwapTokenList.sol";
+import "./ITokenList.sol";
 
-contract LinkSwapTokenList is AccessControl, ILinkSwapTokenList {
+contract TokenList is AccessControl, ITokenList {
     mapping(uint16 => Token) private tokenList;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -14,12 +14,11 @@ contract LinkSwapTokenList is AccessControl, ILinkSwapTokenList {
         _grantRole(MINTER_ROLE, msg.sender);
     }
 
-    // [1, 0x11f00b9fcefc58cdFe2FFD311c4aB490d964f3C0]
-    function addToken(Token memory _token) external onlyRole(MINTER_ROLE) {
+    function add(Token memory _token) external onlyRole(MINTER_ROLE) {
         tokenList[_token.tokenId] = _token;
     }
 
-    function removeToken(uint16 _tokenId) external onlyRole(MINTER_ROLE) {
+    function remove(uint16 _tokenId) external onlyRole(MINTER_ROLE) {
         delete tokenList[_tokenId];
     }
 
