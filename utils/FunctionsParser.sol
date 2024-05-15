@@ -59,4 +59,29 @@ library FunctionsParser {
     ) internal pure returns (CCIPArgs memory) {
         return parseAsBytes(abi.decode(data, (bytes32)));
     }
+
+    function parseAsString(
+        string memory data
+    ) internal pure returns (CCIPArgs memory) {
+        return parse(stringToUint256(data));
+    }
+
+    /**
+     * @dev converts a string memory to uint256 type
+     */
+    function stringToUint256(
+        string memory data
+    ) internal pure returns (uint256) {
+        uint256 val = 0;
+        bytes memory stringBytes = bytes(data);
+        for (uint256 i = 0; i < stringBytes.length; i++) {
+            uint256 exp = stringBytes.length - i;
+            bytes1 ival = stringBytes[i];
+            uint8 uval = uint8(ival);
+            uint256 jval = uval - uint256(0x30);
+
+            val += (uint256(jval) * (10 ** (exp - 1)));
+        }
+        return val;
+    }
 }

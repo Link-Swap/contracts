@@ -6,6 +6,7 @@ import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/Confir
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
 import "../utils/FunctionsParser.sol";
+import "./CCIPTokenTransfer.sol";
 
 contract FunctionsConsumer is FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
@@ -16,17 +17,25 @@ contract FunctionsConsumer is FunctionsClient, ConfirmedOwner {
     bytes public s_lastResponse;
     bytes32 public s_lastRequestId;
 
-    mapping(bytes32 => string) private requests;
+    struct RequestInfo {
+        address payer;
+        string ccipData;
+    }
+    mapping(bytes32 => RequestInfo) private requests;
 
     error UnexpectedRequestID(bytes32 requestId);
 
     event Response(bytes32 indexed requestId, bytes response, bytes err);
 
+    CCIPTokenTransfer public ccipContract;
+
     constructor(
         address router,
-        bytes32 _donId
+        bytes32 _donId,
+        address ccipAddress
     ) FunctionsClient(router) ConfirmedOwner(msg.sender) {
         donId = _donId;
+        ccipContract = CCIPTokenTransfer(payable(ccipAddress));
     }
 
     /**
@@ -35,6 +44,14 @@ contract FunctionsConsumer is FunctionsClient, ConfirmedOwner {
      */
     function setDonId(bytes32 newDonId) external onlyOwner {
         donId = newDonId;
+    }
+
+    /**
+     * @notice Set CCIP. Note this should not have setter in mainnet
+     * @param ccipAddress New DON ID
+     */
+    function setCCIPContract(address ccipAddress) external onlyOwner {
+        ccipContract = CCIPTokenTransfer(payable(ccipAddress));
     }
 
     /**
@@ -77,7 +94,8 @@ contract FunctionsConsumer is FunctionsClient, ConfirmedOwner {
         );
 
         // We need to store the ccipData for after the request to send to ccip
-        requests[s_lastRequestId] = args[0];
+        requests[s_lastRequestId].payer = msg.sender;
+        requests[s_lastRequestId].ccipData = args[0];
 
         return s_lastRequestId;
     }
@@ -122,15 +140,24 @@ contract FunctionsConsumer is FunctionsClient, ConfirmedOwner {
             revert UnexpectedRequestID(requestId);
         }
 
-        string memory ccipData = requests[requestId];
-        require(bytes(ccipData).length > 0, "Invalid request ID");
+        RequestInfo memory data = requests[requestId];
+        require(bytes(data.ccipData).length > 0, "Invalid request ID");
+        require(data.payer != address(0), "Invalid payer");
 
         s_lastResponse = response;
         s_lastError = err;
-        // FunctionsParser.CCIPArgs memory args = FunctionsParser
-        //     .parseAsBytesMemory(response);
+
+        FunctionsParser.CCIPArgs memory args = FunctionsParser.parseAsString(
+            string(abi.encodePacked(response))
+        );
 
         // Validation should have passed and got all necessary data to process CCIP
+        ccipContract.sendMessagePayLINK(
+            args.destinationChainSelector,
+            args.receiver,
+            data.ccipData,
+            data.payer
+        );
 
         emit Response(requestId, s_lastResponse, s_lastError);
     }
