@@ -16,15 +16,15 @@ contract LinkSwapToken is
 {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    uint256 public constant FAUCET_AMOUNT = 100 * 10 ** 18; // Amount to distribute per request
+    uint256 public constant FAUCET_AMOUNT = 100 * 10**18; // Amount to distribute per request
     uint256 public constant FAUCET_TIMEOUT = 24 hours; // Timeout period for faucet (24 hours)
 
     mapping(address => uint256) private _lastFaucetTime;
 
-    constructor(
-        address defaultAdmin,
-        address minter
-    ) ERC20("LinkSwap", "LSWAP") ERC20Permit("LinkSwap") {
+    constructor(address defaultAdmin, address minter)
+        ERC20("LinkSwap", "LSWAP")
+        ERC20Permit("LinkSwap")
+    {
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(MINTER_ROLE, minter);
     }
@@ -48,9 +48,11 @@ contract LinkSwapToken is
     }
 
     // Function to check the time remaining until the next faucet request is available
-    function timeUntilNextFaucet(
-        address account
-    ) external view returns (uint256) {
+    function timeUntilNextFaucet(address account)
+        external
+        view
+        returns (uint256)
+    {
         if (block.timestamp >= _lastFaucetTime[account] + FAUCET_TIMEOUT) {
             return 0;
         } else {

@@ -110,10 +110,10 @@ contract CCIPTokenTransfer is CCIPReceiver, OwnerIsCreator {
     }
 
     /// @dev Updates the allowlist status of a source chain for transactions.
-    function allowlistSourceChain(
-        uint64 _sourceChainSelector,
-        bool allowed
-    ) external onlyOwner {
+    function allowlistSourceChain(uint64 _sourceChainSelector, bool allowed)
+        external
+        onlyOwner
+    {
         allowlistedSourceChains[_sourceChainSelector] = allowed;
     }
 
@@ -123,10 +123,10 @@ contract CCIPTokenTransfer is CCIPReceiver, OwnerIsCreator {
     }
 
     /// @dev Updates the allowlist status of a sender for transactions.
-    function allowlistAddress(
-        address _address,
-        bool allowed
-    ) external onlyOwner {
+    function allowlistAddress(address _address, bool allowed)
+        external
+    // onlyOwner
+    {
         allowListedAddress[_address] = allowed;
     }
 
@@ -205,10 +205,28 @@ contract CCIPTokenTransfer is CCIPReceiver, OwnerIsCreator {
         return messageId;
     }
 
+    function sendMessagePayLINKEstimate(
+        uint64 _destinationChainSelector,
+        address _receiver,
+        string calldata _text
+        // address payer
+    ) public view returns (uint256 fees) {
+        // Initialize a router client instance to interact with cross-chain router
+        IRouterClient router = IRouterClient(this.getRouter());
+
+        // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
+        Client.EVM2AnyMessage memory evm2AnyMessage = _buildCCIPMessage(
+            _receiver,
+            _text,
+            address(s_linkToken)
+        );
+
+        // Get the fee required to send the CCIP message
+        fees = router.getFee(_destinationChainSelector, evm2AnyMessage);
+    }
+
     /// handle a received message
-    function _ccipReceive(
-        Client.Any2EVMMessage memory any2EvmMessage
-    )
+    function _ccipReceive(Client.Any2EVMMessage memory any2EvmMessage)
         internal
         override
         onlyAllowlisted(
@@ -279,9 +297,11 @@ contract CCIPTokenTransfer is CCIPReceiver, OwnerIsCreator {
     }
 
     // In offchain call this to avoid unnecessary ccip calles
-    function allowanceUsdc(
-        address tokenAddress
-    ) public view returns (uint256 usdcAmount) {
+    function allowanceUsdc(address tokenAddress)
+        public
+        view
+        returns (uint256 usdcAmount)
+    {
         usdcAmount = IERC20(tokenAddress).allowance(msg.sender, address(this));
     }
 
@@ -312,10 +332,10 @@ contract CCIPTokenTransfer is CCIPReceiver, OwnerIsCreator {
     /// @dev This function reverts with a 'NothingToWithdraw' error if there are no tokens to withdraw.
     /// @param _beneficiary The address to which the tokens will be sent.
     /// @param _token The contract address of the ERC20 token to be withdrawn.
-    function withdrawToken(
-        address _beneficiary,
-        address _token
-    ) public onlyOwner {
+    function withdrawToken(address _beneficiary, address _token)
+        public
+        onlyOwner
+    {
         // Retrieve the balance of this contract
         uint256 amount = IERC20(_token).balanceOf(address(this));
 

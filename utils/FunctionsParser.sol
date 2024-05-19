@@ -16,17 +16,19 @@ library FunctionsParser {
     /**
      * @dev convert Chainlinks CCIP Data to uint256
      */
-    function pack(
-        uint64 destinationChainSelector,
-        address receiver
-    ) internal pure returns (uint256) {
+    function pack(uint64 destinationChainSelector, address receiver)
+        internal
+        pure
+        returns (uint256)
+    {
         return uint160(receiver) | (uint256(destinationChainSelector) << 160);
     }
 
-    function packAsBytes(
-        uint64 destinationChainSelector,
-        address receiver
-    ) internal pure returns (bytes32) {
+    function packAsBytes(uint64 destinationChainSelector, address receiver)
+        internal
+        pure
+        returns (bytes32)
+    {
         return bytes32(pack(destinationChainSelector, receiver));
     }
 
@@ -48,40 +50,48 @@ library FunctionsParser {
         return CCIPArgs(destinationChainSelector, reciever);
     }
 
-    function parseAsBytes(
-        bytes32 data
-    ) internal pure returns (CCIPArgs memory) {
+    function parseAsBytes(bytes32 data)
+        internal
+        pure
+        returns (CCIPArgs memory)
+    {
         return parse(uint256(data));
     }
 
-    function parseAsBytesMemory(
-        bytes memory data
-    ) internal pure returns (CCIPArgs memory) {
+    function parseAsBytesMemory(bytes memory data)
+        internal
+        pure
+        returns (CCIPArgs memory)
+    {
         return parseAsBytes(abi.decode(data, (bytes32)));
     }
 
-    function parseAsString(
-        string memory data
-    ) internal pure returns (CCIPArgs memory) {
+    function parseAsString(string memory data)
+        internal
+        pure
+        returns (CCIPArgs memory)
+    {
         return parse(stringToUint256(data));
     }
 
     /**
      * @dev converts a string memory to uint256 type
+     * @notice very expensive and may fail
      */
-    function stringToUint256(
-        string memory data
-    ) internal pure returns (uint256) {
+    function stringToUint256(string memory data)
+        internal
+        pure
+        returns (uint256)
+    {
         uint256 val = 0;
-        bytes memory stringBytes = bytes(data);
-        for (uint256 i = 0; i < stringBytes.length; i++) {
-            uint256 exp = stringBytes.length - i;
-            bytes1 ival = stringBytes[i];
-            uint8 uval = uint8(ival);
-            uint256 jval = uval - uint256(0x30);
-
-            val += (uint256(jval) * (10 ** (exp - 1)));
+        bytes memory b = bytes(data);
+        for (uint256 i = 0; i < b.length; i++) {
+            uint256 c = uint256(uint8(b[i]));
+            if (c >= 48 && c <= 57) {
+                val = val * 10 + (c - 48);
+            }
         }
+
         return val;
     }
 }
