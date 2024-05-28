@@ -24,7 +24,7 @@ contract LogWithCCIP is ILogAutomation, ConfirmedOwner {
     constructor(address ccipAddress) ConfirmedOwner(msg.sender) {
         ccipContract = CCIPTokenTransfer(payable(ccipAddress));
     }
-    
+
     /**
      * @notice Set CCIP. Note this should not have setter in mainnet
      * @param ccipAddress New DON ID
@@ -33,11 +33,10 @@ contract LogWithCCIP is ILogAutomation, ConfirmedOwner {
         ccipContract = CCIPTokenTransfer(payable(ccipAddress));
     }
 
-    function checkLog(Log calldata log, bytes memory)
-        external
-        pure
-        returns (bool upkeepNeeded, bytes memory performData)
-    {
+    function checkLog(
+        Log calldata log,
+        bytes memory
+    ) external pure returns (bool upkeepNeeded, bytes memory performData) {
         upkeepNeeded = true;
         performData = log.data;
     }
@@ -90,10 +89,10 @@ contract LogWithCCIP is ILogAutomation, ConfirmedOwner {
     /// @dev This function reverts with a 'NothingToWithdraw' error if there are no tokens to withdraw.
     /// @param _beneficiary The address to which the tokens will be sent.
     /// @param _token The contract address of the ERC20 token to be withdrawn.
-    function withdrawToken(address _beneficiary, address _token)
-        public
-        onlyOwner
-    {
+    function withdrawToken(
+        address _beneficiary,
+        address _token
+    ) public onlyOwner {
         // Retrieve the balance of this contract
         uint256 amount = IERC20(_token).balanceOf(address(this));
 

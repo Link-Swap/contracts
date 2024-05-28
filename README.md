@@ -1,8 +1,25 @@
-### LinkSwap Contracts
+# LinkSwap Contracts
 
-- Chainlink CCIP - Uses for cross chains token transfer
-- Chainlink Functions - Uses for oracles communication with offchain and crosschain validation of CCIP  
-- Chainlink Automation - Uses for automation of CCIP and Functions
+### `/chainlink`
+
+Cross-Chain Token Transfer and Oracles Communication with Off-Chain and Cross-Chain Validation. LinkSwap uses the `CCIPTokenTransfer.sol` contract to ensure that tokens can be securely and efficiently transferred between different blockchain networks. By utilizing CCIP, LinkSwap provides a reliable way to move any compatible tokens and cryptocurrencies. Additionally, the `FunctionsConsumer.sol` contract plays a crucial role in facilitating communication between on-chain and off-chain environments. It is used to validate cross-chain token transfers by querying oracles for necessary information such as token approvals, liquidity, and fund availability on both the source and destination chains. This validation ensures that all conditions are met before a cross-chain transaction is executed, enhancing security and reliability.
+
+
+### `/automation`
+The main contract, `LogWithCCIP.sol`, is utilized for the execution of CCIP and Chainlink Functions. It listens for events from successful Chainlink Functions (`FunctionsConsumer.sol`) to initiate a token transfer request, which is validated by Chainlink Functions. Chainlink Automation then triggers the CCIP contract to complete the transfer. This automation reduces the need for manual intervention and ensures timely and accurate processing of cross-chain transactions.
+
+### `/parsers`
+The contracts include libraries and helper functions for the LinkSwap contracts. These are used to perform off-chain parsing and deserialize data, providing essential tools for developers.
+
+### `/util`
+These contracts manage the LSWAP tokens for faucet and minting, as well as the token list for the LinkSwap platform. They ensure decentralized and accurate mappings of cross-chain tokens.
+
+### `/utils`
+Libraries and helper functions for the LinkSwap contracts.
+
+## Installation
+
+*npm coming soon!*
 
 ## Deployed Contracts
 
@@ -18,7 +35,7 @@
 	"BNB": "0xb1a8ED6906bD10895Ae7D96569A0310e47c85Be5",
 	"Gnosis": "0xeDd5e3333fe570cc54a3d6e26DD009de571126AD",
 	"Wemix": "",
-	"Celo": 
+	"Celo": "0x0c2549DB92613ED09AC65aE467bFc60Da7e6910C",
 }
 ```
 
@@ -61,7 +78,7 @@
 }
 ```
 
-### (1) LSWAP
+### LSWAP
 ```json
 {
 	"Fuji": "0x6E91F576DEda25aD0CfE19C23aEf953c2eA59413",
@@ -76,7 +93,7 @@
 }
 ```
 
-### Link Swap BAT (5)
+### Link Swap BAT
 ```json
 {
 	"Fuji": "",
@@ -90,10 +107,10 @@
 }
 ```
 
-### (6) UNI
+### Link Swap UNI
 ```json
 {
-	"Fuji": "",
+	"Fuji": "0x1F3B2aB5a9Be6FDB765E3d1064383F1E411B5010",
 	"Amoy": "0x5d3aab4ff526FCD787A1e2d283E707a4c7a0E68C",
 	"Sepolia": "0xb9dC04fB2E58d9ea635484427732369FBEbdb412",
 	"Base": "",
